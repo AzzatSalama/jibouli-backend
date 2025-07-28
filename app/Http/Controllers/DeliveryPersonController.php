@@ -135,7 +135,7 @@ class DeliveryPersonController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'livreur_name' => 'sometimes|string|max:255',
-                'livreur_phone' => 'sometimes|nullable|string|max:20|unique:delivery_person,delivery_phone,' . $authEntityService->getUserById($deliveryPerson->user_id)->email,
+                'livreur_phone' => 'sometimes|nullable|string|max:20|unique:delivery_person,delivery_phone,' . $deliveryPerson->delivery_phone,
                 'email' => 'sometimes|string|email|max:255|unique:user,email,' . $authEntityService->getUserById($deliveryPerson->user_id)->email,
                 'password' => 'sometimes|string|min:8|confirmed',
                 'is_available' => 'sometimes|boolean',
