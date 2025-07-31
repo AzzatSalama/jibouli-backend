@@ -14,9 +14,9 @@ class SetTenantDatabase
         $host = $request->getHost(); // e.g., 'edu.jibouli.lvmanager.net'
 
         if ($host === 'jibouli.lvmanager.net') {
-            $database = 'jibouli';
+            $database = env('DB_DATABASE');
         } elseif ($host === 'edu.jibouli.lvmanager.net') {
-            $database = 'jibouli_edu';
+            $database = env('EDU_DB_DATABASE');
         } else {
             return response()->json(['error' => 'Unauthorized domain'], 403);
         }

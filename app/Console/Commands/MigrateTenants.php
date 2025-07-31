@@ -12,7 +12,10 @@ class MigrateTenants extends Command
 
     public function handle()
     {
-        $databases = ['jibouli', 'jibouli_edu'];
+        $databases = [
+            env('DB_DATABASE'),
+            env('EDU_DB_DATABASE')
+        ];
 
         foreach ($databases as $connection) {
             $this->info("Migrating: $connection");
