@@ -124,20 +124,27 @@ class DeliveryPersonController extends Controller
     /**
      * Update delivery person information
      */
-    public function update(Request $request, AuthEntityService $authEntityService, $id = null)
+    protected $authEntityService;
+
+    public function __construct(AuthEntityService $authEntityService)
+    {
+        $this->authEntityService = $authEntityService;
+    }
+
+    public function update(Request $request, $id = null)
     {
         $authUser = Auth::guard('sanctum')->user();
-        // dd($authUser->role);
-        $deliveryPersonId = $authUser->role == "admin" ? $id : $authUser->id; // if the person trying to update is an admin, he can update any delivery person, otherwise it will be a delivery driver who can only update his own data
+        $deliveryPersonId = $authUser->role == "admin" ? $id : $authUser->id;
 
         try {
             $deliveryPerson = DeliveryPerson::where('user_id', $deliveryPersonId)->firstOrFail();
 
             $validator = Validator::make($request->all(), [
                 'livreur_name' => 'sometimes|string|max:255',
-                'livreur_phone' => 'sometimes|nullable|string|max:20|unique:delivery_person,delivery_phone,' . $deliveryPerson->delivery_phone,
-                'email' => 'sometimes|string|email|max:255|unique:user,email,' . $authEntityService->getUserById($deliveryPerson->user_id)->email,
+                'livreur_phone' => 'sometimes|nullable|string|max:20|unique:delivery_person,delivery_phone,' . $deliveryPerson->id,
+                'email' => 'sometimes|string|email|max:255|unique:user,email,' . $deliveryPerson->user->id,
                 'password' => 'sometimes|string|min:8|confirmed',
+                'solde' => 'sometimes|numeric',
                 'is_available' => 'sometimes|boolean',
             ]);
 
@@ -162,7 +169,8 @@ class DeliveryPersonController extends Controller
             $deliveryPerson->update([
                 'delivery_person_name' => $validated['livreur_name'] ?? $deliveryPerson->delivery_person_name,
                 'delivery_phone' => $validated['livreur_phone'] ?? $deliveryPerson->delivery_phone,
-                'is_available' => $deliveryPerson->balance > 2
+                'balance' => $validated['solde'] ?? $deliveryPerson->balance,
+                'is_available' => $deliveryPerson->balance > 3
                     ? ($validated['is_available'] ?? $deliveryPerson->is_available)
                     : false,
             ]);

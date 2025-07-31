@@ -334,8 +334,8 @@ class OrderController extends Controller
             'status' => 'delivered',
             'delivered_canceled_at' => now()
         ]);
-        $order->deliveryPerson->decrement('balance', 2.00);
-        if ($order->deliveryPerson->balance <= 2) {
+        $order->deliveryPerson->decrement('balance', 3.00);
+        if ($order->deliveryPerson->balance <= 3) {
             $order->deliveryPerson->update(['is_available' => false]);
         }
 
