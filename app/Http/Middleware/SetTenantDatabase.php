@@ -13,9 +13,9 @@ class SetTenantDatabase
     {
         $origin = $request->headers->get('origin');
 
-        if ($origin === 'jibouli.lvmanager.net') {
+        if ($origin === 'https://ibouli.lvmanager.net') {
             $database = env('DB_DATABASE');
-        } elseif ($origin === 'edu.jibouli.lvmanager.net' || $origin === 'edu-jibouli.lvmanager.net') {
+        } elseif ($origin === 'https://edu.jibouli.lvmanager.net' || $origin === 'https://edu-jibouli.lvmanager.net') {
             $database = env('EDU_DB_DATABASE');
         } else {
             return response()->json(['error' => 'Unauthorized domain'], 403);

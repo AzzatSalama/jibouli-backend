@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Artisan;
 
 class MigrateTenants extends Command
@@ -17,12 +19,19 @@ class MigrateTenants extends Command
             env('EDU_DB_DATABASE')
         ];
 
-        foreach ($databases as $connection) {
-            $this->info("Migrating: $connection");
+        foreach ($databases as $database) {
+            $this->info("Migrating: $database");
+
+            // Set DB connection dynamically before any queries
+            Config::set('database.connections.mysql.database', $database);
+
+            // Reconnect with new DB settings
+            DB::purge('mysql');
+            DB::reconnect('mysql');
 
             Artisan::call('migrate', [
-                '--database' => $connection,
-                '--force' => true,
+                '--database' => 'mysql',
+                '--force' => true, // Required for production or non-interactive
             ]);
 
             $this->info(Artisan::output());
