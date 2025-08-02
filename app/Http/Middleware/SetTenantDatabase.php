@@ -11,11 +11,11 @@ class SetTenantDatabase
 {
     public function handle(Request $request, Closure $next)
     {
-        $origin = $request->headers->get('origin');
+        $clientDomain = $request->header('X-Client-Domain');
 
-        if ($origin === 'https://jibouli.lvmanager.net') {
+        if ($clientDomain === 'https://jibouli.lvmanager.net') {
             $database = env('DB_DATABASE');
-        } elseif ($origin === 'https://edu.jibouli.lvmanager.net' || $origin === 'https://edu-jibouli.lvmanager.net') {
+        } elseif ($clientDomain === 'https://edu.jibouli.lvmanager.net' || $clientDomain === 'https://edu-jibouli.lvmanager.net') {
             $database = env('EDU_DB_DATABASE');
         } else {
             return response()->json(['error' => 'Unauthorized domain'], 403);
