@@ -13,7 +13,7 @@ class SetTenantDatabase
     {
         $origin = $request->headers->get('origin');
 
-        if ($origin === 'https://ibouli.lvmanager.net') {
+        if ($origin === 'https://jibouli.lvmanager.net') {
             $database = env('DB_DATABASE');
         } elseif ($origin === 'https://edu.jibouli.lvmanager.net' || $origin === 'https://edu-jibouli.lvmanager.net') {
             $database = env('EDU_DB_DATABASE');
