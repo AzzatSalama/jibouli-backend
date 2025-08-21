@@ -233,11 +233,11 @@ class DeliveryPersonController extends Controller
         try {
             $deliveryPerson = DeliveryPerson::findOrFail($id);
 
-            if ($deliveryPerson->orders()->exists()) {
-                return response()->json([
-                    'message' => 'Cannot delete delivery person with associated orders'
-                ], 409);
-            }
+            // if ($deliveryPerson->orders()->exists()) {
+            //     return response()->json([
+            //         'message' => 'Cannot delete delivery person with associated orders'
+            //     ], 409);
+            // }
 
             $deliveryPerson->delete();
             Cache::forget('delivery_person');
