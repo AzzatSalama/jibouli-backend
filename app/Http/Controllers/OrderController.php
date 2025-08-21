@@ -261,7 +261,10 @@ class OrderController extends Controller
         }
 
         if ($order->task || $order->cancellationCause) {
-            return response()->json(['message' => 'Order has related records'], 403);
+            //delete the order tasks and cancellation causes and actions on order if they exists
+            $order->task()->delete();
+            $order->cancellationCause()->delete();
+            $order->actionsOnOrder()->delete();
         }
 
         $order->delete();

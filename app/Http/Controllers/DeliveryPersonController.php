@@ -247,7 +247,7 @@ class DeliveryPersonController extends Controller
 
             $deliveryPerson->delete();
             Cache::forget('delivery_person');
-            return response()->json(null, 204);
+            return response()->json(null, 201);
         } catch (\Throwable $th) {
             return response()->json([
                 'message' => 'Error fetching employee data',
