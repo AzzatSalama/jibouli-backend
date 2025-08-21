@@ -134,10 +134,16 @@ class DeliveryPersonController extends Controller
     public function update(Request $request, $id = null)
     {
         $authUser = Auth::guard('sanctum')->user();
-        $deliveryPersonId = $authUser->role == "admin" ? $id : $authUser->id;
 
         try {
-            $deliveryPerson = DeliveryPerson::where('user_id', $deliveryPersonId)->firstOrFail();
+            if ($authUser->role == "admin") {
+                $deliveryPerson = DeliveryPerson::where('id', $id)->first();
+            } else {
+                $deliveryPerson = DeliveryPerson::where('user_id', $authUser->id)->first();
+            }
+            if (!$deliveryPerson) {
+                return response()->json(['error' => 'No delivery person found for the specified user'], 404);
+            }
 
             $validator = Validator::make($request->all(), [
                 'livreur_name' => 'sometimes|string|max:255',
