@@ -304,35 +304,37 @@ class PartnerController extends Controller
         ], 200);
     }
 
-    public function deleteOrder($id)
+    public function deleteOrder(string $id)
     {
         try {
             $order = Order::findOrFail($id);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['message' => 'La commande n\'est pas trouvé'], 404);
-        }
-
-        $user = Auth::guard('sanctum')->user();
-        // Verify partner owns the order
-        if ($order->user_id !== $user->id) {
-            return response()->json(['message' => 'Unauthorized action'], 403);
-        }
-
-        // Prevent deletion of completed orders
-        if (in_array($order->status, ['delivered', 'canceled'])) {
-            return response()->json([
-                'message' => 'Cannot delete completed orders'
-            ], 422);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'An error occurred while retrieving the order'], 500);
         }
 
         try {
-            DB::transaction(function () use ($order) {
-                // Delete related records if needed
-                // Example: $order->task()->delete();
 
-                // Delete the order
-                $order->delete();
-            });
+            $user = Auth::guard('sanctum')->user();
+            // Verify partner owns the order
+            if ($order->user_id !== $user->id) {
+                return response()->json(['message' => 'Unauthorized action'], 403);
+            }
+
+            // Prevent deletion of completed orders
+            if (in_array($order->status, ['delivered', 'canceled'])) {
+                return response()->json([
+                    'message' => 'Cannot delete completed orders'
+                ], 422);
+            }
+        } catch (\Throwable $th) {
+            return response()->json(['message' => 'An error occurred while checking order ownership'], 500);
+        }
+
+        try {
+            // Delete the order
+            $order->delete();
 
             return response()->json(['message' => 'Order deleted successfully'], 200);
         } catch (\Exception $e) {
