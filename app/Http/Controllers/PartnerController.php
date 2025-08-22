@@ -304,8 +304,14 @@ class PartnerController extends Controller
         ], 200);
     }
 
-    public function deleteOrder(Order $order)
+    public function deleteOrder($id)
     {
+        try {
+            $order = Order::findOrFail($id);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
         $user = Auth::guard('sanctum')->user();
         // Verify partner owns the order
         if ($order->user_id !== $user->id) {
@@ -319,15 +325,23 @@ class PartnerController extends Controller
             ], 422);
         }
 
-        DB::transaction(function () use ($order) {
-            // Delete related records if needed
-            // Example: $order->task()->delete();
+        try {
+            DB::transaction(function () use ($order) {
+                // Delete related records if needed
+                // Example: $order->task()->delete();
 
-            // Delete the order
-            $order->delete();
-        });
+                // Delete the order
+                $order->delete();
+            });
 
-        return response()->json(['message' => 'Order deleted successfully']);
+            return response()->json(['message' => 'Order deleted successfully'], 200);
+        } catch (\Exception $e) {
+            // Log the exception or perform additional error handling if needed
+            return response()->json([
+                'message' => 'An error occurred while deleting the order',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function clients()
