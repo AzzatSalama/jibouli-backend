@@ -309,7 +309,7 @@ class PartnerController extends Controller
         try {
             $order = Order::findOrFail($id);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['message' => 'Order not found'], 404);
+            return response()->json(['message' => 'La commande n\'est pas trouvé'], 404);
         }
 
         $user = Auth::guard('sanctum')->user();
