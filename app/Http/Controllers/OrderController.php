@@ -254,28 +254,37 @@ class OrderController extends Controller
 
     public function destroy(string $id)
     {
-        $order = Order::findOrFail($id);
+        try {
+            $order = Order::findOrFail($id);
 
-        if (in_array($order->status, ['delivered', 'canceled'])) {
-            return response()->json(['message' => 'Cannot delete completed orders'], 403);
+            if (in_array($order->status, ['delivered', 'canceled'])) {
+                return response()->json(['message' => 'Cannot delete completed orders'], 403);
+            }
+
+            if ($order->task || $order->cancellationCause) {
+                // Delete the order's related tasks, cancellation causes, and actions if they exist.
+                $order->task()->delete();
+                $order->cancellationCause()->delete();
+                $order->actionsOnOrder()->delete();
+            }
+
+            $order->delete();
+
+            $this->notificationService->sendNotification(
+                'Commande supprimée',
+                "La commande #{$order->id} a été supprimée",
+                "/orders.html",
+                $this->notificationService->getAdminsTokens()
+            );
+
+            Cache::forget('pending_orders');
+
+            return response()->json(null, 204);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Order not found'], 404);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => 'Failed to delete order: ' . $th->getMessage()], 500);
         }
-
-        if ($order->task || $order->cancellationCause) {
-            //delete the order tasks and cancellation causes and actions on order if they exists
-            $order->task()->delete();
-            $order->cancellationCause()->delete();
-            $order->actionsOnOrder()->delete();
-        }
-
-        $order->delete();
-        $this->notificationService->sendNotification(
-            'Commande supprimée',
-            "La commande #{$order->id} a été supprimée",
-            "/orders.html",
-            $this->notificationService->getAdminsTokens()
-        );
-        Cache::forget('pending_orders');
-        return response()->json(null, 204);
     }
 
     private function validateStatusTransition(string $currentStatus, string $newStatus)
