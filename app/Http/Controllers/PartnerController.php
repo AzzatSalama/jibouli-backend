@@ -306,8 +306,9 @@ class PartnerController extends Controller
 
     public function deleteOrder(Order $order)
     {
+        $user = Auth::guard('sanctum')->user();
         // Verify partner owns the order
-        if ($order->user_id !== auth()->id()) {
+        if ($order->user_id !== $user->id) {
             return response()->json(['message' => 'Unauthorized action'], 403);
         }
 
