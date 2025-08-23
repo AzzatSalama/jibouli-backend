@@ -180,6 +180,7 @@ class PartnerController extends Controller
                 'client_notes' => $validated['client_notes'],
                 'status' => 'pending',
                 'user_id' => $user->id,
+                'partner_id' => $authEntityService->getPartnerByUserId($user->id)->id
             ]);
 
             cache()->forget('pending_orders'); // Clear the cache for orders
@@ -318,7 +319,7 @@ class PartnerController extends Controller
 
             $user = Auth::guard('sanctum')->user();
             // Verify partner owns the order
-            if ($order->user_id !== $user->id) {
+            if ($order->user->id !== $user->id) {
                 return response()->json(['message' => 'Unauthorized action'], 403);
             }
 

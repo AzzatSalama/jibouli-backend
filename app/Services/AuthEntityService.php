@@ -67,4 +67,15 @@ class AuthEntityService
 
         return $partner;
     }
+
+    public function getPartnerByUserId(int $userId): ?object
+    {
+        $partner = Partner::where('user_id', $userId)->first();
+
+        if (!$partner) {
+            return null;
+        }
+
+        return $partner;
+    }
 }
