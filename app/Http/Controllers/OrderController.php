@@ -57,7 +57,7 @@ class OrderController extends Controller
         try {
             $orders = Cache::remember('pending_orders', 60, function () {
                 return Order::where('status', 'pending')
-                    ->with('client')
+                    ->with('client', 'partner')
                     ->orderBy('created_at', 'asc')
                     ->get();
             });
