@@ -222,6 +222,24 @@ class PartnerController extends Controller
         return response()->json($orders, 200);
     }
 
+    public function pendingOrders(AuthEntityService $authEntityService)
+    {
+        $user = Auth::guard('sanctum')->user();
+        $partnerId = $authEntityService->getPartnerByUserId($user->id); // Ensure the user is a partner
+
+        $orders = Order::with(['client'])
+            ->where('status', 'pending')
+            ->latest()
+            ->get()
+            ->where('partner_id', $partnerId);
+
+        if ($orders->isEmpty()) {
+            return response()->json(['message' => 'No pending orders found'], 204);
+        }
+
+        return response()->json($orders, 200);
+    }
+
     // public function updateOrder($id, Request $request)
     // {
     //     $order = Order::findOrFail($id);

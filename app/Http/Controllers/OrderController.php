@@ -52,10 +52,12 @@ class OrderController extends Controller
         }
     }
 
-    public function pendingOrders()
+    public function pendingOrders(Request $request)
     {
         try {
-            $orders = Cache::remember('pending_orders', 60, function () {
+            $dbName = DB::connection()->getDatabaseName();
+            $cacheKey = 'pending_orders_' . $dbName;
+            $orders = Cache::remember($cacheKey, 60, function () {
                 return Order::where('status', 'pending')
                     ->with('client', 'partner')
                     ->orderBy('created_at', 'asc')
