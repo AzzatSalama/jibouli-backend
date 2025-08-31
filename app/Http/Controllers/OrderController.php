@@ -259,10 +259,6 @@ class OrderController extends Controller
         try {
             $order = Order::findOrFail($id);
 
-            if (in_array($order->status, ['delivered', 'canceled'])) {
-                return response()->json(['message' => 'Cannot delete completed orders'], 403);
-            }
-
             if ($order->task || $order->cancellationCause) {
                 // Delete the order's related tasks, cancellation causes, and actions if they exist.
                 $order->task()->delete();
