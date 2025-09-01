@@ -40,7 +40,7 @@ class NotificationService
                         "notification" => [
                             "title" => $title,
                             "body" => $body,
-                            "image" => asset('path_to_your_image/steLogo.png'),
+                            "image" => asset('https://jibouli.lvmanager.net/jibouli-icon.ico'),
                         ],
                         "webpush" => [
                             "fcm_options" => [
